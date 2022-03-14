@@ -1,5 +1,5 @@
 """
-Implements a Resnet18 backbone with 3 task specific heads
+Implements a Resnet18 stem with 3 MLP task specific heads
 """
 import torch
 from torch import nn
@@ -62,7 +62,12 @@ class Baseline(nn.Module):
         genre_out = self.genre_branch(stem_out)
         style_out = self.style_branch(stem_out)
 
-        return torch.cat((artist_out, genre_out, style_out), dim=1)
+        outputs_dict = dict()
+        outputs_dict['artist'] = artist_out
+        outputs_dict['genre'] = genre_out
+        outputs_dict['style'] = style_out
+
+        return outputs_dict
 
     def get_output_size(self):
         dummy_input = torch.zeros(1, 3, 224, 224)
