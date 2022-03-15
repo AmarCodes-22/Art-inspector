@@ -1,18 +1,26 @@
-"""
-Implements a Resnet18 stem with 3 MLP task specific heads
-"""
+from tty import setraw
+from typing import Dict, List, Tuple
+
 import torch
 from torch import nn
-from torchviz import make_dot
 from torchinfo import summary
 from torch.nn import Identity
 from torchvision.models.resnet import ResNet, BasicBlock
 
 
 class Stem(nn.Module):
-    def __init__(self) -> None:
+    def __init__(self, layers: List[int] = [2, 2, 2, 2]) -> None:
+        """Initialize a ResNet stem for baseline composed of BasicBlocks
+
+        Parameters
+        ----------
+        layers : List[int], optional
+            Each item in layers indicated a stage and the value for that stage indicates
+            the number of BasicBlocks in that stage, by default [2, 2, 2, 2] to create a
+            ResNet18 architecture
+        """
         super(Stem, self).__init__()
-        self.model = ResNet(block=BasicBlock, layers=[2, 2, 2, 2])
+        self.model = ResNet(block=BasicBlock, layers=layers)
         self.model.fc = Identity()
 
     def forward(self, x):
@@ -23,11 +31,25 @@ class Stem(nn.Module):
 
     def get_output_size(self):
         dummy_input = torch.zeros(1, 3, 224, 224)
-        return self.forward(dummy_input).data.size()
+        return self.forward(dummy_input).data.size()[1]
 
 
 class Branch(nn.Module):
-    def __init__(self, in_features, hidden_dims, out_features) -> None:
+    def __init__(
+        self, in_features: int, out_features: int, hidden_dims: int = 256
+    ) -> None:
+        """Initialize a MLP for the task specific head
+
+        Parameters
+        ----------
+        in_features : int
+            Input features to the MLP, should be same as out_features from Stem
+        out_features : int
+            Out features to the MLP, should be equal to the number of classes for that
+            task
+        hidden_dims : int, optional
+            Number of units in the hidden layer of MLP, by default 256
+        """
         super(Branch, self).__init__()
         self.input_size = in_features
         self.model = nn.Sequential(
@@ -48,12 +70,24 @@ class Branch(nn.Module):
 
 
 class Baseline(nn.Module):
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        stem_layers: List[int] = [2, 2, 2, 2],
+    ) -> None:
+        """Initialize baseline
+
+        Parameters
+        ----------
+        stem_layers: List[int]
+            A list of stages in a ResNet network where value for each stage is the
+            number of BasicBlocks for that stage
+        """
         super(Baseline, self).__init__()
-        self.stem = self._make_stem()
-        self.artist_branch = self._make_branch(512, 256, 20)
-        self.genre_branch = self._make_branch(512, 256, 10)
-        self.style_branch = self._make_branch(512, 256, 20)
+
+        self.stem = self._make_stem(layers=stem_layers)
+        # self.artist_branch = self._make_branch(512, 256, 20)
+        # self.genre_branch = self._make_branch(512, 256, 10)
+        # self.style_branch = self._make_branch(512, 256, 20)
 
     def forward(self, x):
         stem_out = self.stem(x)
@@ -63,45 +97,44 @@ class Baseline(nn.Module):
         style_out = self.style_branch(stem_out)
 
         outputs_dict = dict()
-        outputs_dict['artist'] = artist_out
-        outputs_dict['genre'] = genre_out
-        outputs_dict['style'] = style_out
+        outputs_dict["artist"] = artist_out
+        outputs_dict["genre"] = genre_out
+        outputs_dict["style"] = style_out
 
         return outputs_dict
 
-    def get_output_size(self):
-        dummy_input = torch.zeros(1, 3, 224, 224)
-        return self.forward(dummy_input).data.size()
+    def initialize_branches(self, branches: Dict[str, Tuple[int, int]]):
+        self.num_branches = len(branches)
+        for branch_name, (in_features, out_features) in branches.items():
+            branch_name += "_branch"
+            setattr(self, branch_name, self._make_branch(in_features, out_features))
 
-    def _make_stem(self):
-        stem = Stem()
+    def _make_stem(self, layers):
+        stem = Stem(layers=layers)
         return stem
 
-    def _make_branch(self, in_features, hidden_dims, out_features):
-        branch = Branch(in_features, hidden_dims, out_features)
+    def _make_branch(self, in_features: int, out_features: int, hidden_dims: int = 256):
+        branch = Branch(in_features, out_features, hidden_dims)
         return branch
+
+    def print_model_summary(self):
+        print('Printing model summary')
+        summary(self, input_size=(1, 3, 224, 224))
 
 
 if __name__ == "__main__":
-    baseline = Baseline()
 
-    # summary(baseline, input_size=(1, 3, 224, 224))
-    # print(baseline.get_output_size())
+    # makes a resnet18 stem and 3 MLP task specific heads
+    resnet18_layers = [2, 2, 2, 2]
+    baseline = Baseline(stem_layers=resnet18_layers)
 
-    # baseline.stem.print_summary()
-    # print(baseline.stem.get_output_size())
+    stem_out_size = baseline.stem.get_output_size()
 
-    # baseline.artist_branch.print_summary()
-    # print(baseline.artist_branch.get_output_size())
+    branches = {
+        "artist": (stem_out_size, 20),
+        "genre": (stem_out_size, 10),
+        "style": (stem_out_size, 20)
+    }
 
-    # baseline.genre_branch.print_summary()
-    # print(baseline.genre_branch.get_output_size())
-
-    # baseline.style_branch.print_summary()
-    # print(baseline.style_branch.get_output_size())
-
-    # graphviz plot for baseline
-    # x = torch.zeros(1, 3, 224, 224)
-    # y = baseline(x)
-    # plot = make_dot(y.mean(), params=dict(baseline.named_parameters()))
-    # plot.render(filename='baseline.dot')
+    baseline.initialize_branches(branches=branches)
+    baseline.print_model_summary()
