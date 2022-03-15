@@ -1,4 +1,4 @@
-from tty import setraw
+from pprint import pprint
 from typing import Dict, List, Tuple
 
 import torch
@@ -85,9 +85,6 @@ class Baseline(nn.Module):
         super(Baseline, self).__init__()
 
         self.stem = self._make_stem(layers=stem_layers)
-        # self.artist_branch = self._make_branch(512, 256, 20)
-        # self.genre_branch = self._make_branch(512, 256, 10)
-        # self.style_branch = self._make_branch(512, 256, 20)
 
     def forward(self, x):
         stem_out = self.stem(x)
@@ -138,3 +135,5 @@ if __name__ == "__main__":
 
     baseline.initialize_branches(branches=branches)
     baseline.print_model_summary()
+
+    pprint(baseline(torch.zeros(1, 3, 224, 224)))
