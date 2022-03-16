@@ -14,7 +14,7 @@ class Stem(nn.Module):
         Parameters
         ----------
         layers : List[int], optional
-            Each item in layers indicated a stage and the value for that stage indicates
+            Each item in layers indicates a stage and the value for that stage indicates
             the number of BasicBlocks in that stage, by default [2, 2, 2, 2] to create a
             ResNet18 architecture
         """
@@ -25,11 +25,30 @@ class Stem(nn.Module):
     def forward(self, x):
         return self.model(x)
 
-    def print_summary(self):
+    def print_summary(self, input_size: Tuple[int, int, int, int]):
+        """Print summary using torchinfo
+
+        Parameters
+        ----------
+        input_size : Tuple[int, int, int, int]
+            Input image shape: (Batch_size, num_channels, height, width)
+        """
         # summary(self.model, input_size=(16, 3, 28, 28))
-        summary(self.model, input_size=(16, 3, 224, 224))
+        summary(self.model, input_size=input_size)
 
     def get_output_size(self, input_size: Tuple[int, int, int, int]):
+        """Get output size of the stem for the input size provided
+
+        Parameters
+        ----------
+        input_size : Tuple[int, int, int, int]
+            Size of input image: (batch_size, num_channels, height, width)
+
+        Returns
+        -------
+        int
+            Number of output features after passing image of 'input_size' through stem
+        """
         dummy_input = torch.zeros(input_size)
         return self.forward(dummy_input).data.size()[1]
 
@@ -90,7 +109,6 @@ class Baseline(nn.Module):
         stem_out = self.stem(x)
 
         outputs_dict = dict()
-        # todo: use getattrs here
         for branch_name, (in_features, out_features) in self.branches.items():
             branch_name += "_branch"
             branch = getattr(self, branch_name)
@@ -99,7 +117,14 @@ class Baseline(nn.Module):
         return outputs_dict
 
     def initialize_branches(self, branches: Dict[str, Tuple[int, int]]):
-        # self.num_branches = len(branches)
+        """Initialize branches specific to each branch in the dataset
+
+        Parameters
+        ----------
+        branches : Dict[str, Tuple[int, int]]
+            dict mapping from 'branch_name' to (in_features, out_features)
+            out_features is equal to number of classes for that branch
+        """
         self.branches = branches
         for branch_name, (in_features, out_features) in self.branches.items():
             branch_name += "_branch"
@@ -124,11 +149,9 @@ if __name__ == "__main__":
     resnet18_layers = [2, 2, 2, 2]
     baseline = Baseline(stem_layers=resnet18_layers)
 
-    # baseline.stem.print_summary()
-
     stem_out_size = baseline.stem.get_output_size()
 
-    # this information comes from your ImageFolder dataset
+    # this information should come from your ImageFolder dataset
     branches = {
         "artist": (stem_out_size, 20),
         "genre": (stem_out_size, 10),
@@ -137,5 +160,3 @@ if __name__ == "__main__":
 
     baseline.initialize_branches(branches=branches)
     baseline.print_model_summary()
-
-    # pprint(baseline(torch.zeros(1, 3, 224, 224)))
