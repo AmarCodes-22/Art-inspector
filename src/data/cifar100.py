@@ -1,3 +1,4 @@
+from pathlib import Path
 from os import listdir, getcwd
 from collections import defaultdict
 from pathlib import Path
@@ -9,22 +10,27 @@ from torchvision.datasets import ImageFolder
 
 
 class Cifar100:
-    def __init__(self, dir_path: str, branch_names: Optional[List[str]] = None) -> None:
+    def __init__(
+        self, dir_path: Optional[str] = None, branch_names: Optional[List[str]] = None
+    ) -> None:
         """Initialize Cifar100 dataset
 
         Parameters
         ----------
-        dir_path : str
+        dir_path : Optional[str]
             Path to the directory where this dataset is located
-        branch_names : List[str]
+        branch_names : Optional[List[str]]
             List of branch names to load the dataset for
         """
-        self.dir_path = dir_path
+        if dir_path is not None:
+            self.dir_path = dir_path
+        else:
+            self.dir_path = join(Path(getcwd()).parent, "data", "cifar100")
 
         if branch_names is None:
-            self.branch_names = listdir(join(dir_path, "train"))
+            self.branch_names = listdir(join(self.dir_path, "train"))
         else:
-            self.valid_branch_names = set(listdir(join(dir_path, "train")))
+            self.valid_branch_names = set(listdir(join(self.dir_path, "train")))
             for branch_name in branch_names:
                 if branch_name not in self.valid_branch_names:
                     print(
@@ -46,7 +52,7 @@ class Cifar100:
         datasets = defaultdict(dict)
 
         for i, branch in enumerate(self.branch_names):
-            print(f"{i}. Creating dataset for {branch}")
+            # print(f"{i}. Creating dataset for {branch}")
 
             branch_train_dir = join(self.dir_path, "train", branch)
             branch_test_dir = join(self.dir_path, "test", branch)
@@ -57,11 +63,11 @@ class Cifar100:
             if isdir(branch_test_dir):
                 datasets[branch]["test"] = ImageFolder(branch_test_dir)
 
-        pprint(datasets)
+        # pprint(datasets)
         return datasets
 
     def __repr__(self) -> str:
-        #todo: implement this
+        # todo: implement this
         pass
 
 

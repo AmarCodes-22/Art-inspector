@@ -1,4 +1,3 @@
-from pprint import pprint
 from typing import Dict, List, Tuple
 
 import torch
@@ -27,10 +26,11 @@ class Stem(nn.Module):
         return self.model(x)
 
     def print_summary(self):
+        # summary(self.model, input_size=(16, 3, 28, 28))
         summary(self.model, input_size=(16, 3, 224, 224))
 
-    def get_output_size(self):
-        dummy_input = torch.zeros(1, 3, 224, 224)
+    def get_output_size(self, input_size: Tuple[int, int, int, int]):
+        dummy_input = torch.zeros(input_size)
         return self.forward(dummy_input).data.size()[1]
 
 
@@ -89,20 +89,19 @@ class Baseline(nn.Module):
     def forward(self, x):
         stem_out = self.stem(x)
 
-        artist_out = self.artist_branch(stem_out)
-        genre_out = self.genre_branch(stem_out)
-        style_out = self.style_branch(stem_out)
-
         outputs_dict = dict()
-        outputs_dict["artist"] = artist_out
-        outputs_dict["genre"] = genre_out
-        outputs_dict["style"] = style_out
+        # todo: use getattrs here
+        for branch_name, (in_features, out_features) in self.branches.items():
+            branch_name += "_branch"
+            branch = getattr(self, branch_name)
+            outputs_dict[branch] = branch(stem_out)
 
         return outputs_dict
 
     def initialize_branches(self, branches: Dict[str, Tuple[int, int]]):
-        self.num_branches = len(branches)
-        for branch_name, (in_features, out_features) in branches.items():
+        # self.num_branches = len(branches)
+        self.branches = branches
+        for branch_name, (in_features, out_features) in self.branches.items():
             branch_name += "_branch"
             setattr(self, branch_name, self._make_branch(in_features, out_features))
 
@@ -114,9 +113,9 @@ class Baseline(nn.Module):
         branch = Branch(in_features, out_features, hidden_dims)
         return branch
 
-    def print_model_summary(self):
-        print('Printing model summary')
-        summary(self, input_size=(1, 3, 224, 224))
+    def print_model_summary(self, input_size: Tuple[int, int, int, int]):
+        print("Printing model summary")
+        summary(self, input_size=input_size)
 
 
 if __name__ == "__main__":
@@ -125,15 +124,18 @@ if __name__ == "__main__":
     resnet18_layers = [2, 2, 2, 2]
     baseline = Baseline(stem_layers=resnet18_layers)
 
+    # baseline.stem.print_summary()
+
     stem_out_size = baseline.stem.get_output_size()
 
+    # this information comes from your ImageFolder dataset
     branches = {
         "artist": (stem_out_size, 20),
         "genre": (stem_out_size, 10),
-        "style": (stem_out_size, 20)
+        "style": (stem_out_size, 20),
     }
 
     baseline.initialize_branches(branches=branches)
     baseline.print_model_summary()
 
-    pprint(baseline(torch.zeros(1, 3, 224, 224)))
+    # pprint(baseline(torch.zeros(1, 3, 224, 224)))
