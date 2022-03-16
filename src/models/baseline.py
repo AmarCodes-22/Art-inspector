@@ -109,24 +109,25 @@ class Baseline(nn.Module):
         stem_out = self.stem(x)
 
         outputs_dict = dict()
-        for branch_name, (in_features, out_features) in self.branches.items():
+        for branch_name, (in_features, out_features) in self.branch_configs.items():
             branch_name += "_branch"
             branch = getattr(self, branch_name)
             outputs_dict[branch] = branch(stem_out)
 
+        # todo: this should probably return a torch.Tensor
         return outputs_dict
 
-    def initialize_branches(self, branches: Dict[str, Tuple[int, int]]):
+    def initialize_branches(self, branch_configs: Dict[str, Tuple[int, int]]):
         """Initialize branches specific to each branch in the dataset
 
         Parameters
         ----------
-        branches : Dict[str, Tuple[int, int]]
+        branch_configs : Dict[str, Tuple[int, int]]
             dict mapping from 'branch_name' to (in_features, out_features)
             out_features is equal to number of classes for that branch
         """
-        self.branches = branches
-        for branch_name, (in_features, out_features) in self.branches.items():
+        self.branch_configs = branch_configs
+        for branch_name, (in_features, out_features) in self.branch_configs.items():
             branch_name += "_branch"
             setattr(self, branch_name, self._make_branch(in_features, out_features))
 
