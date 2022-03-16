@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 import torch
 from torch import nn
@@ -105,17 +105,30 @@ class Baseline(nn.Module):
 
         self.stem = self._make_stem(layers=stem_layers)
 
-    def forward(self, x):
+    def forward(self, x, branch_name: Optional[str] = None):
         stem_out = self.stem(x)
 
-        outputs_dict = dict()
-        for branch_name, (in_features, out_features) in self.branch_configs.items():
+        if branch_name is None:
+            outputs_dict = dict()
+            output_tensors = []
+
+            # below would probably now work for branches with different num_classes
+            # output = torch.empty(size=(len(self.branch_configs), ))
+
+            for branch_name, (in_features, out_features) in self.branch_configs.items():
+                branch_name += "_branch"
+                branch = getattr(self, branch_name)
+
+                outputs_dict[branch] = branch(stem_out)
+                output_tensors.append(outputs_dict[branch])
+
+            # todo: this should probably return a torch.Tensor
+            return torch.cat(output_tensors, dim=1)
+        else:
             branch_name += "_branch"
             branch = getattr(self, branch_name)
-            outputs_dict[branch] = branch(stem_out)
-
-        # todo: this should probably return a torch.Tensor
-        return outputs_dict
+            output_tensor = branch(stem_out)
+            return output_tensor
 
     def initialize_branches(self, branch_configs: Dict[str, Tuple[int, int]]):
         """Initialize branches specific to each branch in the dataset
