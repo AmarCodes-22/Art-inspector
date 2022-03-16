@@ -6,6 +6,7 @@ from pprint import pprint
 from typing import List, Optional, Mapping
 from os.path import join, isdir
 
+from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
 
 
@@ -25,7 +26,7 @@ class Cifar100:
         if dir_path is not None:
             self.dir_path = dir_path
         else:
-            self.dir_path = join(Path(getcwd()).parent, "data", "cifar100")
+            self.dir_path = join(Path(__file__).parents[2], "data", "cifar100")
 
         if branch_names is None:
             self.branch_names = listdir(join(self.dir_path, "train"))
@@ -40,6 +41,8 @@ class Cifar100:
                     )
                 break
             self.branch_names = branch_names
+
+        self.branch_datasets = None
 
     def load_branch_datasets(self) -> Mapping[str, Mapping[str, ImageFolder]]:
         """Load datasets for all branches inside Cifar100
@@ -64,15 +67,37 @@ class Cifar100:
                 datasets[branch]["test"] = ImageFolder(branch_test_dir)
 
         # pprint(datasets)
+        self.branch_datasets = datasets
         return datasets
 
+    def load_branch_dataloaders(self):
+        if self.branch_datasets is None:
+            self.branch_datasets = self.load_branch_datasets()
+
+        dataloaders = defaultdict(dict)
+        for branch_name, branch_dataset in self.branch_datasets.items():
+            dataloaders[branch_name]["train"] = DataLoader(
+                branch_dataset["train"], batch_size=16, shuffle=True
+            )
+            dataloaders[branch_name]["test"] = DataLoader(
+                branch_dataset["test"], batch_size=16, shuffle=True
+            )
+
+        self.branch_dataloaders = dataloaders
+        return dataloaders
+
     def __repr__(self) -> str:
-        # todo: implement this
+        # todo: implement this beautifully
         pass
 
 
 if __name__ == "__main__":
-    cifar100_dir_path = join(Path(getcwd()).parent, "data", "cifar100")
-    cifar100 = Cifar100(cifar100_dir_path)
+    cifar100 = Cifar100()
 
-    datasets = cifar100.load_branch_datasets()
+    dataloaders = cifar100.load_branch_dataloaders()
+
+    for k, v in dataloaders.items():
+        print(k)
+        print(len(v["train"].dataset.classes))
+        pprint(v)
+        break
