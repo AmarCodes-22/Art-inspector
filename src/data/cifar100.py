@@ -1,5 +1,5 @@
 from pathlib import Path
-from os import listdir, getcwd
+from os import listdir
 from collections import defaultdict
 from pathlib import Path
 from pprint import pprint
@@ -8,6 +8,7 @@ from os.path import join, isdir
 
 from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
+from torchvision import transforms
 
 
 class Cifar100:
@@ -43,6 +44,9 @@ class Cifar100:
             self.branch_names = branch_names
 
         self.branch_datasets = None
+        self.transform = transforms.Compose([
+            transforms.ToTensor()
+        ])
 
     def load_branch_datasets(self) -> Mapping[str, Mapping[str, ImageFolder]]:
         """Load datasets for all branches inside Cifar100
@@ -61,10 +65,14 @@ class Cifar100:
             branch_test_dir = join(self.dir_path, "test", branch)
 
             if isdir(branch_train_dir):
-                datasets[branch]["train"] = ImageFolder(branch_train_dir)
+                datasets[branch]["train"] = ImageFolder(
+                    branch_train_dir, transform=self.transform
+                )
 
             if isdir(branch_test_dir):
-                datasets[branch]["test"] = ImageFolder(branch_test_dir)
+                datasets[branch]["test"] = ImageFolder(
+                    branch_test_dir, transform=self.transform
+                )
 
         # pprint(datasets)
         self.branch_datasets = datasets
@@ -87,7 +95,7 @@ class Cifar100:
         return dataloaders
 
     def __repr__(self) -> str:
-        # todo: implement this beautifully
+        # todo: implement this beauty
         pass
 
 
