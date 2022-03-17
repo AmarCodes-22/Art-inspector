@@ -1,6 +1,8 @@
-
-#todo: implement training loop with Wrapper loss function over CrossEntropy
+# todo: implement training loop with Wrapper loss function over CrossEntropy
 from pprint import pprint
+
+from torch import nn
+from torch import optim
 
 from src.data.cifar100 import Cifar100
 from src.models.baseline import Baseline
@@ -37,20 +39,26 @@ if __name__ == "__main__":
     baseline = load_baseline(branch_dataloaders=cifar_branch_dataloaders)
     # baseline.print_model_summary(input_size=(16, 3, 32, 32))
 
+    # pprint(cifar_branch_dataloaders)
+
     for branch_name, branch_dataloaders in cifar_branch_dataloaders.items():
-        print(f'Branch: {branch_name}')
-        # pprint(branch_dataloaders)
+        print(f"Branch: {branch_name}")
+        #     # pprint(branch_dataloaders)
 
         train_features, train_labels = next(iter(branch_dataloaders["train"]))
-        print(f"Features shape: {train_features.shape}")
+        #     print(f"Features shape: {train_features.shape}")
+        print(train_labels)
         print(f"Labels shape: {train_labels.shape}")
+        print(train_labels[0])
 
-        # output with branch_name
-        out = baseline(train_features, branch_name)
-        print('Output shape when passing through single branch', out.shape)
+        #     # output with branch_name
+        #     out = baseline(train_features, branch_name)
+        #     print("Output shape when passing through single branch", out.shape)
 
-        # output without branch_name
-        out = baseline(train_features)
-        print('Output shape when passing through all branches (inference time)', out.shape)
+        #     # output without branch_name
+        #     out = baseline(train_features)
+        #     print(
+        #         "Output shape when passing through all branches (inference time)", out.shape
+        #     )
 
         break

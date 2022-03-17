@@ -139,6 +139,7 @@ class Baseline(nn.Module):
             dict mapping from 'branch_name' to (in_features, out_features)
             out_features is equal to number of classes for that branch
         """
+        self.num_branches = len(branch_configs.keys())
         self.branch_configs = branch_configs
         for branch_name, (in_features, out_features) in self.branch_configs.items():
             branch_name += "_branch"
@@ -154,7 +155,7 @@ class Baseline(nn.Module):
 
     def print_model_summary(self, input_size: Tuple[int, int, int, int]):
         print("Printing model summary")
-        summary(self, input_size=input_size)
+        print(summary(self, input_size=input_size))
 
 
 if __name__ == "__main__":

@@ -44,9 +44,7 @@ class Cifar100:
             self.branch_names = branch_names
 
         self.branch_datasets = None
-        self.transform = transforms.Compose([
-            transforms.ToTensor()
-        ])
+        self.transform = transforms.Compose([transforms.ToTensor()])
 
     def load_branch_datasets(self) -> Mapping[str, Mapping[str, ImageFolder]]:
         """Load datasets for all branches inside Cifar100
