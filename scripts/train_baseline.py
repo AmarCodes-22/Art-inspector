@@ -1,4 +1,3 @@
-# todo: implement training loop with Wrapper loss function over CrossEntropy
 from pprint import pprint
 
 from torch import nn
@@ -11,7 +10,6 @@ from src.models.baseline import Baseline
 def load_cifar100():
     cifar100 = Cifar100()
     dataloaders = cifar100.load_branch_dataloaders()
-
     return dataloaders
 
 
@@ -22,7 +20,7 @@ def load_baseline(branch_dataloaders: dict):
     stem_out_size = model.stem.get_output_size(input_size=(16, 3, 32, 32))
 
     # make branch_configs used to initialize branches
-    branch_configs = {}
+    branch_configs = dict()
     for branch_name, branch_dataloader in branch_dataloaders.items():
         branch_configs[branch_name] = tuple(
             (stem_out_size, len(branch_dataloader["train"].dataset.classes))
@@ -35,30 +33,49 @@ def load_baseline(branch_dataloaders: dict):
 # todo: use argparse here
 if __name__ == "__main__":
     cifar_branch_dataloaders = load_cifar100()
+    # pprint(cifar_branch_dataloaders)
 
     baseline = load_baseline(branch_dataloaders=cifar_branch_dataloaders)
     # baseline.print_model_summary(input_size=(16, 3, 32, 32))
 
-    # pprint(cifar_branch_dataloaders)
+    branches = list(cifar_branch_dataloaders.keys())
 
-    for branch_name, branch_dataloaders in cifar_branch_dataloaders.items():
-        print(f"Branch: {branch_name}")
-        #     # pprint(branch_dataloaders)
+    train_loaders = []
+    test_loaders = []
+    for branch in branches:
+        dataloaders = cifar_branch_dataloaders[branch]
 
-        train_features, train_labels = next(iter(branch_dataloaders["train"]))
-        #     print(f"Features shape: {train_features.shape}")
-        print(train_labels)
-        print(f"Labels shape: {train_labels.shape}")
-        print(train_labels[0])
+        train_loader = dataloaders["train"]
+        test_loader = dataloaders["test"]
 
-        #     # output with branch_name
-        #     out = baseline(train_features, branch_name)
-        #     print("Output shape when passing through single branch", out.shape)
+        train_loaders.append(train_loader)
+        test_loaders.append(test_loader)
 
-        #     # output without branch_name
-        #     out = baseline(train_features)
-        #     print(
-        #         "Output shape when passing through all branches (inference time)", out.shape
-        #     )
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(baseline.parameters(), lr=0.0005, momentum=0.9)
 
-        break
+    for epoch in range(2):
+        for i, data in enumerate(zip(*train_loaders)):
+            running_loss = 0.0
+            for branch_num, (branch_name, branch_batch) in enumerate(
+                zip(branches, data)
+            ):
+                images, labels = branch_batch
+                optimizer.zero_grad()
+
+                # todo: move forward, backward, optimize in func train_step
+                # forward
+                outputs = baseline(images, branch_name)
+
+                # backward
+                loss = criterion(outputs, labels)
+                loss.backward()
+
+                # optimize
+                optimizer.step()
+
+                running_loss += loss.item()
+            print(f"Epoch: {epoch + 1}, Batch: {i+1}, Loss: {running_loss:.3f}")
+            running_loss = 0.0
+
+    print("Finished training")
