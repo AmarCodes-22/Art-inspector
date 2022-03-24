@@ -1,4 +1,3 @@
-# todo: Remove clutter
 # --find-links https://download.pytorch.org/whl/torch_stable.html
 black
 kaggle
