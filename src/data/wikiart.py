@@ -1,7 +1,9 @@
+from collections import defaultdict
 import os
+from pprint import pprint
 
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Tuple, Union
 
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
@@ -33,7 +35,9 @@ class WikiartBranch(Dataset):
         self._validate(argument="split", argument_value=split)
         self._validate(argument="dir_path", argument_value=dir_path)
 
-        self.transform = transforms.Compose([transforms.ToTensor()])
+        self.transform = transforms.Compose(
+            [transforms.ToTensor(), transforms.Resize((224, 224))]
+        )
         self.dataset = ImageFolder(
             os.path.join(self.images_dir, split), transform=self.transform
         )
@@ -86,33 +90,51 @@ class WikiartBranch(Dataset):
                 self.images_dir = argument_value
 
 
-class Wikiart(Dataset):
+class Wikiart:
     def __init__(self, split: str) -> None:
-        super(Wikiart, self).__init__()
 
         self.branch_names = ("artists", "styles", "genres")
+        self.branch_batch_sizes = {"artists": 16, "styles": 32, "genres": 32}
 
         for branch_name in self.branch_names:
             branch_dataset = WikiartBranch(branch_name, split)
-            setattr(self, branch_name + "_branch", branch_dataset)
+            setattr(self, branch_name + "_dataset", branch_dataset)
             print(
                 f"Loaded {split} dataset for branch {branch_name} with"
-                f" {len(getattr(self, branch_name + '_branch').dataset)} images."
+                f" {len(getattr(self, branch_name + '_dataset').dataset)} images."
             )
 
-    def __len__(self):  # num of images total
+    def load_dataloaders(self):
+        dataloaders = {}
+        for branch_name in self.branch_names:
+            branch_dataloader = DataLoader(
+                getattr(self, branch_name + "_dataset").dataset,
+                batch_size=self.branch_batch_sizes[branch_name],
+                shuffle=True,
+            )
+            dataloaders[branch_name] = branch_dataloader
+
+        return dataloaders
+
+    def __len__(self):
         return (
-            len(self.artists_branch.dataset)
-            + len(self.genres_branch.dataset)
-            + len(self.styles_branch.dataset)
+            len(self.artists_dataset.dataset)
+            + len(self.genres_dataset.dataset)
+            + len(self.styles_dataset.dataset)
         )
-
-    def __getitem__(self, index):  # loads sequentially from WikiartBranch
-        pass
-
-    def __repr__(self) -> str:  # shows details about all branches
-        pass
 
 
 if __name__ == "__main__":
     wikiart = Wikiart(split="train")
+    wikiart_dataloaders = wikiart.load_dataloaders()
+
+    pprint(wikiart_dataloaders)
+
+    images, labels = next(iter(wikiart_dataloaders["artists"]))
+    print(images.shape, labels.shape)
+
+    images, labels = next(iter(wikiart_dataloaders["genres"]))
+    print(images.shape, labels.shape)
+
+    images, labels = next(iter(wikiart_dataloaders["styles"]))
+    print(images.shape, labels.shape)
