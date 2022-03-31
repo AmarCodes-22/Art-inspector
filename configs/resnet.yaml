@@ -1,0 +1,11 @@
+MODEL:
+  BACKBONE:
+    FREEZE_AT: 0  # 1 means freezing the stem, 2 means stem + first stage and so on
+  RESNET:
+    STEM_OUT_CHANNELS: 64  # output channels from the stem
+    RES2_OUT_CHANNELS: 64  # output channels from first stage
+    DEPTH: 18  # default resnet model depth
+    OUT_FEATURES: ['res4', 'res5']  # output of first stage is called res2
+  FPN:
+    IN_FEATURES: ['res4', 'res5']
+    OUT_CHANNELS: 128
