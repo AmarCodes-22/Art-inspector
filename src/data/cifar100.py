@@ -1,14 +1,13 @@
-from pathlib import Path
-from os import listdir
 from collections import defaultdict
+from os import listdir
+from os.path import isdir, join
 from pathlib import Path
 from pprint import pprint
-from typing import List, Optional, Mapping
-from os.path import join, isdir
+from typing import List, Mapping, Optional
 
 from torch.utils.data import DataLoader
-from torchvision.datasets import ImageFolder
 from torchvision import transforms
+from torchvision.datasets import ImageFolder
 
 
 class Cifar100:

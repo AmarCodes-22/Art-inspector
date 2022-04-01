@@ -1,11 +1,10 @@
-from collections import defaultdict
 import os
-from pprint import pprint
-
+from collections import defaultdict
 from pathlib import Path
+from pprint import pprint
 from typing import Optional, Tuple, Union
 
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 

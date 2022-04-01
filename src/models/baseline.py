@@ -1,10 +1,10 @@
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Optional, Tuple
 
 import torch
 from torch import nn
-from torchinfo import summary
 from torch.nn import Identity
-from torchvision.models.resnet import ResNet, BasicBlock
+from torchinfo import summary
+from torchvision.models.resnet import BasicBlock, ResNet
 
 
 class Stem(nn.Module):

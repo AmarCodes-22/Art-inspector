@@ -1,7 +1,6 @@
 from pprint import pprint
 
-from torch import nn
-from torch import optim
+from torch import nn, optim
 
 from src.data.cifar100 import Cifar100
 from src.models.baseline import Baseline
