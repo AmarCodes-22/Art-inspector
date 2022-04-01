@@ -1,4 +1,4 @@
-all: black validate_docs mypy
+all: black validate_docs mypy isort
 
 black:
 	black --experimental-string-processing src/ scripts/
@@ -8,3 +8,6 @@ validate_docs:
 
 mypy:
 	-mypy src/ scripts/
+
+isort:
+	isort src/ scripts/
