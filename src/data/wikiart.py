@@ -127,13 +127,13 @@ if __name__ == "__main__":
     wikiart = Wikiart(split="train")
     wikiart_dataloaders = wikiart.load_dataloaders()
 
-    pprint(wikiart_dataloaders)
+    # pprint(wikiart_dataloaders)
 
     images, labels = next(iter(wikiart_dataloaders["artists"]))
-    print(images.shape, labels.shape)
+    print("Artists branch -", images.shape, labels.shape)
 
     images, labels = next(iter(wikiart_dataloaders["genres"]))
-    print(images.shape, labels.shape)
+    print("Genres branch -", images.shape, labels.shape)
 
     images, labels = next(iter(wikiart_dataloaders["styles"]))
-    print(images.shape, labels.shape)
+    print("Styles branch -", images.shape, labels.shape)
