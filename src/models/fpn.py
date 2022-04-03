@@ -8,8 +8,8 @@ from detectron2.modeling.backbone.fpn import LastLevelMaxPool
 from torch import nn
 
 from ..utils.util import load_config
-from .resnet import build_resnet_backbone
 from . import ARTNET_CONFIG_FPATH
+from .resnet import build_resnet_backbone
 
 
 class FPN(nn.Module):

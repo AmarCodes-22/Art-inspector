@@ -1,11 +1,12 @@
+import torch
 from detectron2.config.config import CfgNode
 from torch import nn
-import torch
 
 from ..utils.util import load_config
 from . import ARTNET_CONFIG_FPATH
 
 
+# todo: Implement branch arch to work with FPNs
 class Branch(nn.Module):
     def __init__(
         self, in_features: int, out_features: int, hidden_dims: int = 256
@@ -45,11 +46,11 @@ def build_branch(cfg: CfgNode, branch_name: str):
     return Branch(in_features=stem_out_size, out_features=branch_num_classes)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     artnet_config = load_config(ARTNET_CONFIG_FPATH)
     # print(artnet_config)
 
-    branch = build_branch(artnet_config, branch_name='artists')
+    branch = build_branch(artnet_config, branch_name="artists")
 
     dummy_in = torch.zeros((1, artnet_config.MODEL.RESNET.RES2_OUT_CHANNELS * 8))
     dummy_out = branch(dummy_in)

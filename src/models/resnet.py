@@ -10,7 +10,6 @@ from torch import nn
 
 from ..utils.util import load_config
 from . import ARTNET_CONFIG_FPATH
-from .branch import Branch
 
 
 class Resnet(nn.Module):
