@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-from ..utils.util import load_config
+from ..utils import load_config
 from . import ARTNET_CONFIG_FPATH
 from .branch import build_branch
 from .resnet import build_resnet_backbone
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     artnet = ArtNet(config_fpath=ARTNET_CONFIG_FPATH)
 
     dummy_in = torch.zeros((1, 3, 224, 224))
-    dummy_out = artnet(dummy_in)
+    dummy_out = artnet(dummy_in, 'artists')
 
-    for k, v in dummy_out.items():
-        print(k, type(v), v.shape)
+    print(dummy_out.shape)
+

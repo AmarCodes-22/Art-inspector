@@ -2,7 +2,7 @@ import torch
 from detectron2.config.config import CfgNode
 from torch import nn
 
-from ..utils.util import load_config
+from ..utils import load_config
 from . import ARTNET_CONFIG_FPATH
 
 

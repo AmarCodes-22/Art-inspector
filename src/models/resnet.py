@@ -8,7 +8,7 @@ from detectron2.layers import ShapeSpec
 from detectron2.modeling.backbone.resnet import BasicBlock, BasicStem
 from torch import nn
 
-from ..utils.util import load_config
+from ..utils import load_config
 from . import ARTNET_CONFIG_FPATH
 
 
