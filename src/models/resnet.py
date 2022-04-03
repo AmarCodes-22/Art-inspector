@@ -11,6 +11,35 @@ from torch import nn
 from ..utils.util import load_config
 
 
+class Branch(nn.Module):
+    def __init__(
+        self, in_features: int, out_features: int, hidden_dims: int = 256
+    ) -> None:
+        """Initialize a MLP for the task specific head
+
+        Parameters
+        ----------
+        in_features : int
+            Input features to the MLP, should be same as out_features from Stem
+        out_features : int
+            Out features to the MLP, should be equal to the number of classes for that
+            task
+        hidden_dims : int, optional
+            Number of units in the hidden layer of MLP, by default 256
+        """
+        super(Branch, self).__init__()
+        self.input_size = in_features
+        self.linear1 = nn.Linear(in_features, hidden_dims)
+        self.linear2 = nn.Linear(hidden_dims, out_features)
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+        x = self.linear1(x)
+        x = self.relu(x)
+        x = self.linear2(x)
+        return x
+
+
 class Resnet(nn.Module):
     """
     Implements a resnet backbone of the network. (only R18/R34 for now)
@@ -20,7 +49,7 @@ class Resnet(nn.Module):
         self,
         stem: BasicStem,
         stages: List[List[BasicBlock]],
-        out_features: List[str],
+        out_features: List[str]
         # num_classes: Optional[int] = None,
     ) -> None:
         super(Resnet, self).__init__()
@@ -63,6 +92,7 @@ class Resnet(nn.Module):
         if "linear" in out_features:
             self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
             name = "linear"
+            self._out_feature_channels[name] = curr_channels
 
         # todo: check this, this might get 'name' that doesn't exist
         if out_features is None:
@@ -99,6 +129,9 @@ class Resnet(nn.Module):
         output_shapes = dict()
         for name in self._out_features:
             if name == "linear":
+                output_shapes[name] = ShapeSpec(
+                    channels=self._out_feature_channels[name]
+                )
                 continue
             output_shapes[name] = ShapeSpec(
                 channels=self._out_feature_channels[name],
@@ -214,7 +247,6 @@ if __name__ == "__main__":
     resnet_config_fpath = os.path.join(
         Path(__file__).parents[2], "configs", "resnet.yaml"
     )
-
     resnet_config = load_config(filepath=resnet_config_fpath)
     resnet_backbone = build_resnet_backbone(resnet_config)
 
@@ -222,3 +254,16 @@ if __name__ == "__main__":
     dummy_out = resnet_backbone(dummy_in)
     for k, v in dummy_out.items():
         print(k, type(v), v.shape)
+
+    resnet_backbone_outsize = resnet_backbone.output_shape()["linear"].channels
+
+    branches = dict()
+    # todo: store branch out_features in a dict?
+    for branch_name in ("artists", "styles", "genres"):
+        branches[branch_name] = Branch(
+            in_features=resnet_backbone_outsize, out_features=20
+        )
+
+    for branch_name, branch in branches.items():
+        branch_out = branch(dummy_out["linear"])
+        print(branch_name, type(branch_out), branch_out.shape)

@@ -71,19 +71,26 @@ class Branch(nn.Module):
         """
         super(Branch, self).__init__()
         self.input_size = in_features
-        self.model = nn.Sequential(
-            nn.Linear(in_features, hidden_dims),
-            nn.ReLU(),
-            nn.Linear(hidden_dims, out_features),
-        )
+        self.linear1 = nn.Linear(in_features, hidden_dims)
+        self.linear2 = nn.Linear(hidden_dims, out_features)
+
+        # self.model = nn.Sequential(
+        #     nn.Linear(in_features, hidden_dims),
+        #     nn.ReLU(),
+        #     nn.Linear(hidden_dims, out_features),
+        # )
 
     def forward(self, x):
-        return self.model(x)
+        x = self.linear1(x)
+        x = nn.ReLU(x)
+        x = nn.linear2(x)
+        return x
+        # return self.model(x)
 
-    def print_summary(self):
-        summary(self.model, input_size=(1, self.input_size))
+    # def print_summary(self):
+    #     summary(self.model, input_size=(1, self.input_size))
 
-    def get_output_size(self):
+    def output_size(self):
         dummy_input = torch.zeros(1, self.input_size)
         return self.forward(dummy_input).data.size()
 
