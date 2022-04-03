@@ -21,13 +21,13 @@ class Resnet(nn.Module):
         stem: BasicStem,
         stages: List[List[BasicBlock]],
         out_features: List[str],
-        num_classes: Optional[int] = None,
+        # num_classes: Optional[int] = None,
     ) -> None:
         super(Resnet, self).__init__()
         assert len(stages) > 0, "Length of stages received can't be 0"
 
         self.stem = stem
-        self.num_classes = num_classes
+        # self.num_classes = num_classes
 
         current_stride = self.stem.stride
         self._out_feature_strides = {"stem": current_stride}
@@ -36,14 +36,6 @@ class Resnet(nn.Module):
         self.stage_names, self.stages = [], []
 
         stages = self._get_relevant_stages(stages, out_features)
-        # if out_features is not None:
-        #     num_stages_to_keep = max(
-        #         [
-        #             {"res2": 1, "res3": 2, "res4": 3, "res5": 4}.get(f, 0)
-        #             for f in out_features
-        #         ]
-        #     )
-        # stages = stages[:num_stages_to_keep]
 
         for i, blocks in enumerate(stages):
             assert (
@@ -60,9 +52,6 @@ class Resnet(nn.Module):
             stage = nn.Sequential(*blocks)
 
             self._add_stage(stage_name, stage)
-            # self.add_module(stage_name, stage)
-            # self.stage_names.append(stage_name)
-            # self.stages.append(stage)
 
             self._out_feature_strides[stage_name] = current_stride = int(
                 current_stride * np.prod([k.stride for k in blocks])
@@ -71,23 +60,17 @@ class Resnet(nn.Module):
             self._out_feature_channels[stage_name] = curr_channels
         self.stage_names = tuple(self.stage_names)
 
-        if num_classes is not None:
+        if "linear" in out_features:
             self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-            self.linear = nn.Linear(curr_channels, num_classes)
-            # change name because linear layer now becomes the last layer
             name = "linear"
 
+        # todo: check this, this might get 'name' that doesn't exist
         if out_features is None:
             out_features = [name]
         self._out_features = out_features
         assert len(self._out_features)
 
         self._check_validity_of_output_features()
-        # children = [x[0] for x in self.named_children()]
-        # for out_feature in self._out_features:
-        #     assert out_feature in children, "Available children: {}, got {}".format(
-        #         ", ".join(children), out_feature
-        #     )
 
     def forward(self, x):
         assert (
@@ -95,29 +78,33 @@ class Resnet(nn.Module):
         ), f"Resnet takes an input of size (N, C, H, W), got {x.shape} instead."
 
         outputs = {}
+
         x = self.stem(x)
         if "stem" in self._out_features:
             outputs["stem"] = x
+
         for stage_name, stage in zip(self.stage_names, self.stages):
             x = stage(x)
             if stage_name in self._out_features:
                 outputs[stage_name] = x
-        if self.num_classes is not None:
+
+        if "linear" in self._out_features:
             x = self.avgpool(x)
             x = torch.flatten(x, 1)
-            x = self.linear(x)
-            if "linear" in self._out_features:
-                outputs["linear"] = x
+            outputs["linear"] = x
+
         return outputs
 
     def output_shape(self):
-        return {
-            name: ShapeSpec(
+        output_shapes = dict()
+        for name in self._out_features:
+            if name == "linear":
+                continue
+            output_shapes[name] = ShapeSpec(
                 channels=self._out_feature_channels[name],
                 stride=self._out_feature_strides[name],
             )
-            for name in self._out_features
-        }
+        return output_shapes
 
     @staticmethod
     def make_stage(
@@ -155,6 +142,8 @@ class Resnet(nn.Module):
     def _check_validity_of_output_features(self):
         children = [x[0] for x in self.named_children()]
         for out_feature in self._out_features:
+            if out_feature == "linear":
+                continue
             assert out_feature in children, "Available children: {}, got {}".format(
                 ", ".join(children), out_feature
             )
@@ -163,7 +152,7 @@ class Resnet(nn.Module):
         if out_features is not None:
             num_stages_to_keep = max(
                 [
-                    {"res2": 1, "res3": 2, "res4": 3, "res5": 4}.get(f, 0)
+                    {"res2": 1, "res3": 2, "res4": 3, "res5": 4, "linear": 4}.get(f, 0)
                     for f in out_features
                 ]
             )
@@ -228,7 +217,6 @@ if __name__ == "__main__":
 
     resnet_config = load_config(filepath=resnet_config_fpath)
     resnet_backbone = build_resnet_backbone(resnet_config)
-    print(type(resnet_backbone))
 
     dummy_in = torch.zeros((1, 3, 224, 224))
     dummy_out = resnet_backbone(dummy_in)
