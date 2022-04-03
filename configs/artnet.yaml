@@ -1,0 +1,18 @@
+MODEL:
+  # BACKBONE:
+    # FREEZE_AT: 0  # 1 means freezing the stem, 2 means stem + first stage and so on
+  RESNET:
+    STEM_OUT_CHANNELS: 64
+    RES2_OUT_CHANNELS: 64  # output channels from first stage
+    DEPTH: 18
+    OUT_FEATURES: ['linear']  # output of first stage is called res2
+  FPN:
+    IN_FEATURES: ['res4', 'res5']
+    OUT_CHANNELS: 128
+  BRANCH:
+    ARTISTS:
+      OUT_UNITS: 20
+    GENRES:
+      OUT_UNITS: 10
+    STYLES:
+      OUT_UNITS: 20

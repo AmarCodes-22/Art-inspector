@@ -9,6 +9,7 @@ from detectron2.modeling.backbone.resnet import BasicBlock, BasicStem
 from torch import nn
 
 from ..utils.util import load_config
+from . import ARTNET_CONFIG_FPATH
 from .branch import Branch
 
 
@@ -216,11 +217,8 @@ def build_resnet_backbone(cfg):
 
 
 if __name__ == "__main__":
-    resnet_config_fpath = os.path.join(
-        Path(__file__).parents[2], "configs", "resnet.yaml"
-    )
-    resnet_config = load_config(filepath=resnet_config_fpath)
-    resnet_backbone = build_resnet_backbone(resnet_config)
+    artnet_config = load_config(filepath=ARTNET_CONFIG_FPATH)
+    resnet_backbone = build_resnet_backbone(artnet_config)
 
     dummy_in = torch.zeros((1, 3, 224, 224))
     dummy_out = resnet_backbone(dummy_in)

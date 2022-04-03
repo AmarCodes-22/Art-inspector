@@ -9,6 +9,7 @@ from torch import nn
 
 from ..utils.util import load_config
 from .resnet import build_resnet_backbone
+from . import ARTNET_CONFIG_FPATH
 
 
 class FPN(nn.Module):
@@ -114,12 +115,8 @@ def build_resnet_fpn_backbone(cfg):
 
 
 if __name__ == "__main__":
-    resnet_config_fpath = os.path.join(
-        Path(__file__).parents[2], "configs", "resnet.yaml"
-    )
-
-    resnet_config = load_config(filepath=resnet_config_fpath)
-    fpn_backbone = build_resnet_fpn_backbone(resnet_config)
+    artnet_config = load_config(filepath=ARTNET_CONFIG_FPATH)
+    fpn_backbone = build_resnet_fpn_backbone(artnet_config)
     print(type(fpn_backbone))
 
     dummy_in = torch.zeros((1, 3, 224, 224))
