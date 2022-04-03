@@ -224,16 +224,3 @@ if __name__ == "__main__":
     dummy_out = resnet_backbone(dummy_in)
     for k, v in dummy_out.items():
         print(k, type(v), v.shape)
-
-    resnet_backbone_outsize = resnet_backbone.output_shape()["linear"].channels
-
-    branches = dict()
-    # todo: store branch out_features in a dict?
-    for branch_name in ("artists", "styles", "genres"):
-        branches[branch_name] = Branch(
-            in_features=resnet_backbone_outsize, out_features=20
-        )
-
-    for branch_name, branch in branches.items():
-        branch_out = branch(dummy_out["linear"])
-        print(branch_name, type(branch_out), branch_out.shape)

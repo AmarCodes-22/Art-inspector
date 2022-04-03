@@ -1,4 +1,9 @@
+from detectron2.config.config import CfgNode
 from torch import nn
+import torch
+
+from ..utils.util import load_config
+from . import ARTNET_CONFIG_FPATH
 
 
 class Branch(nn.Module):
@@ -28,3 +33,24 @@ class Branch(nn.Module):
         x = self.relu(x)
         x = self.linear2(x)
         return x
+
+
+def build_branch(cfg: CfgNode, branch_name: str):
+    branch_config = dict(cfg.MODEL.BRANCH)[branch_name.upper()]
+
+    # output channels double every stage
+    stem_out_size = cfg.MODEL.RESNET.RES2_OUT_CHANNELS * (2 ** 3)
+
+    branch_num_classes = branch_config.NUM_CLASSES
+    return Branch(in_features=stem_out_size, out_features=branch_num_classes)
+
+
+if __name__ == '__main__':
+    artnet_config = load_config(ARTNET_CONFIG_FPATH)
+    # print(artnet_config)
+
+    branch = build_branch(artnet_config, branch_name='artists')
+
+    dummy_in = torch.zeros((1, artnet_config.MODEL.RESNET.RES2_OUT_CHANNELS * 8))
+    dummy_out = branch(dummy_in)
+    print(dummy_out.shape)
