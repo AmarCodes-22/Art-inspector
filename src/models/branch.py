@@ -52,7 +52,7 @@ class FPNBranch(nn.Module):
 
 
 def build_branch(cfg: CfgNode, branch_name: str):
-    branch_config = dict(cfg.MODEL.BRANCH)[branch_name.upper()]
+    branch_config = dict(cfg.MODEL.BRANCH.BRANCHES)[branch_name.upper()]
 
     # output channels double every stage
     stem_out_size = cfg.MODEL.RESNET.RES2_OUT_CHANNELS * (2 ** 3)

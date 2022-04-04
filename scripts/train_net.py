@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     # initilize model, optimizer, criterion
     artnet = load_artnet()
-    optimizer = optim.SGD(artnet.parameters(), lr=1e-3, momentum=0.9)
+    optimizer = optim.SGD(artnet.parameters(), lr=3e-3, momentum=0.9)
     criterion = nn.CrossEntropyLoss()
 
     # number of times to go through the dataset
@@ -60,8 +60,6 @@ if __name__ == "__main__":
                 )
                 running_loss += loss.item()
                 # todo: get accuracy
-                # print(preds.shape, labels.shape)
-                # print(sum(preds == labels))
 
                 # break
 

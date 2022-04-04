@@ -1,10 +1,8 @@
 import math
-import os
-from pathlib import Path
 
 import torch
 import torch.nn.functional as F
-from detectron2.modeling.backbone.fpn import LastLevelMaxPool
+# from detectron2.modeling.backbone.fpn import LastLevelMaxPool
 from torch import nn
 
 from ..utils import load_config
@@ -117,7 +115,7 @@ def build_resnet_fpn_backbone(cfg):
 if __name__ == "__main__":
     artnet_config = load_config(filepath=ARTNET_CONFIG_FPATH)
     fpn_backbone = build_resnet_fpn_backbone(artnet_config)
-    print(type(fpn_backbone))
+    # print(type(fpn_backbone))
 
     dummy_in = torch.zeros((1, 3, 224, 224))
     dummy_out = fpn_backbone(dummy_in)
