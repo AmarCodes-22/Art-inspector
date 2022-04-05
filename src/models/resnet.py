@@ -8,8 +8,8 @@ from detectron2.layers import ShapeSpec
 from detectron2.modeling.backbone.resnet import BasicBlock, BasicStem
 from torch import nn
 
+from .. import ARTNET_CONFIG_FPATH
 from ..utils import load_config
-from . import ARTNET_CONFIG_FPATH
 
 
 class Resnet(nn.Module):
@@ -174,12 +174,12 @@ def build_resnet_backbone(cfg):
     """Create a Resnet instance from config"""
     resnet_stem = BasicStem()
 
-    depth = cfg.MODEL.RESNET.DEPTH
+    depth = cfg.MODELS.RESNET.DEPTH
     assert depth in {18, 34}, "Only support depth 18 and 34 for now"
-    out_features = cfg.MODEL.RESNET.OUT_FEATURES
+    out_features = cfg.MODELS.RESNET.OUT_FEATURES
 
-    in_channels = cfg.MODEL.RESNET.STEM_OUT_CHANNELS
-    out_channels = cfg.MODEL.RESNET.RES2_OUT_CHANNELS
+    in_channels = cfg.MODELS.RESNET.STEM_OUT_CHANNELS
+    out_channels = cfg.MODELS.RESNET.RES2_OUT_CHANNELS
 
     num_blocks_per_stage = {
         18: [2, 2, 2, 2],

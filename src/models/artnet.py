@@ -3,8 +3,8 @@ from torch import nn
 
 from src.models.fpn import build_resnet_fpn_backbone
 
+from .. import ARTNET_CONFIG_FPATH
 from ..utils import load_config
-from . import ARTNET_CONFIG_FPATH
 from .branch import build_branch
 from .resnet import build_resnet_backbone
 
@@ -16,7 +16,7 @@ class ArtNet(nn.Module):
         self.config = load_config(config_fpath)
         self.stem = self._initialize_stem()
         self.branch_names = list(
-            map(str.lower, list(dict(self.config.MODEL.BRANCH.BRANCHES).keys()))
+            map(str.lower, list(dict(self.config.MODELS.BRANCH.BRANCHES).keys()))
         )
 
         for branch_name in self.branch_names:
@@ -32,7 +32,7 @@ class ArtNet(nn.Module):
         return branch_out
 
     def _initialize_stem(self):
-        if self.config.MODEL.BRANCH.BRANCH_TYPE == "linear":
+        if self.config.MODELS.BRANCH.BRANCH_TYPE == "linear":
             stem = build_resnet_backbone(self.config)
         else:
             stem = build_resnet_fpn_backbone(self.config)

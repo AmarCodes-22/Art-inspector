@@ -5,8 +5,8 @@ import torch.nn.functional as F
 # from detectron2.modeling.backbone.fpn import LastLevelMaxPool
 from torch import nn
 
+from .. import ARTNET_CONFIG_FPATH
 from ..utils import load_config
-from . import ARTNET_CONFIG_FPATH
 from .resnet import build_resnet_backbone
 
 
@@ -104,8 +104,8 @@ class FPN(nn.Module):
 
 def build_resnet_fpn_backbone(cfg):
     bottom_up = build_resnet_backbone(cfg)
-    in_features = cfg.MODEL.FPN.IN_FEATURES
-    out_channels = cfg.MODEL.FPN.OUT_CHANNELS
+    in_features = cfg.MODELS.FPN.IN_FEATURES
+    out_channels = cfg.MODELS.FPN.OUT_CHANNELS
     backbone = FPN(
         bottom_up=bottom_up, in_features=in_features, out_channels=out_channels
     )

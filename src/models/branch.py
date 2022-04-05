@@ -2,8 +2,8 @@ import torch
 from detectron2.config.config import CfgNode
 from torch import nn
 
+from .. import ARTNET_CONFIG_FPATH
 from ..utils import load_config
-from . import ARTNET_CONFIG_FPATH
 
 
 class LinearBranch(nn.Module):
@@ -52,15 +52,15 @@ class FPNBranch(nn.Module):
 
 
 def build_branch(cfg: CfgNode, branch_name: str):
-    branch_config = dict(cfg.MODEL.BRANCH.BRANCHES)[branch_name.upper()]
+    branch_config = dict(cfg.MODELS.BRANCH.BRANCHES)[branch_name.upper()]
 
     # output channels double every stage
-    stem_out_size = cfg.MODEL.RESNET.RES2_OUT_CHANNELS * (2 ** 3)
+    stem_out_size = cfg.MODELS.RESNET.RES2_OUT_CHANNELS * (2 ** 3)
 
     branch_num_classes = branch_config.NUM_CLASSES
 
-    assert cfg.MODEL.BRANCH.BRANCH_TYPE in {"fpn", "linear"}
-    if cfg.MODEL.BRANCH.BRANCH_TYPE == "fpn":
+    assert cfg.MODELS.BRANCH.BRANCH_TYPE in {"fpn", "linear"}
+    if cfg.MODELS.BRANCH.BRANCH_TYPE == "fpn":
         return FPNBranch(
             in_channels=128, out_channels=128, out_features=branch_num_classes
         )

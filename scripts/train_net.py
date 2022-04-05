@@ -2,8 +2,10 @@ from torch import nn, optim
 import torch
 
 from src.data.wikiart import Wikiart
-from src.models import ARTNET_CONFIG_FPATH
+from src import ARTNET_CONFIG_FPATH
 from src.models.artnet import ArtNet
+
+from src.utils import load_config
 
 
 def load_wikiart_dataloaders(split: str):
@@ -31,8 +33,11 @@ def train_step(branch_name, inputs, labels, model, optimizer, criterion):
     return preds, loss
 
 
+# todo: implement argparse
 if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    config = load_config(ARTNET_CONFIG_FPATH)
+
     wikiart_trainloaders = load_wikiart_dataloaders(split="train")
 
     branch_names, train_loaders = [], []
@@ -74,3 +79,4 @@ if __name__ == "__main__":
             # break
         # break
     print("Finished training")
+    # todo: implement saving the model's state dict
