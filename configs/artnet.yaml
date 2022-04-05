@@ -1,4 +1,4 @@
-MODEL:
+MODELS:
   # BACKBONE:
     # FREEZE_AT: 0  # 1 means freezing the stem, 2 means stem + first stage and so on
   RESNET:
@@ -19,3 +19,8 @@ MODEL:
         NUM_CLASSES: 10
       STYLES:
         NUM_CLASSES: 20
+DATA:
+  BATCH_SIZE:
+    ARTISTS: 16
+    GENRES: 32
+    STYLES: 32

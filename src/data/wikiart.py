@@ -8,6 +8,9 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 
+from .. import ARTNET_CONFIG_FPATH
+from ..utils import load_config
+
 
 class WikiartBranch(Dataset):
     def __init__(
@@ -93,7 +96,11 @@ class Wikiart:
     def __init__(self, split: str) -> None:
 
         self.branch_names = ("artists", "styles", "genres")
-        self.branch_batch_sizes = {"artists": 16, "styles": 32, "genres": 32}
+        self.branch_batch_sizes = dict(
+            load_config(ARTNET_CONFIG_FPATH).DATA.BATCH_SIZE
+        )
+        print(self.branch_batch_sizes)
+        # self.branch_batch_sizes = {"artists": 16, "styles": 32, "genres": 32}
 
         for branch_name in self.branch_names:
             branch_dataset = WikiartBranch(branch_name, split)
@@ -108,7 +115,7 @@ class Wikiart:
         for branch_name in self.branch_names:
             branch_dataloader = DataLoader(
                 getattr(self, branch_name + "_dataset").dataset,
-                batch_size=self.branch_batch_sizes[branch_name],
+                batch_size=self.branch_batch_sizes[branch_name.upper()],
                 shuffle=True,
             )
             dataloaders[branch_name] = branch_dataloader
