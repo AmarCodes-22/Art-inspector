@@ -1,4 +1,5 @@
 from torch import nn, optim
+import torch
 
 from src.data.wikiart import Wikiart
 from src.models import ARTNET_CONFIG_FPATH
@@ -31,6 +32,7 @@ def train_step(branch_name, inputs, labels, model, optimizer, criterion):
 
 
 if __name__ == "__main__":
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     wikiart_trainloaders = load_wikiart_dataloaders(split="train")
 
     branch_names, train_loaders = [], []
@@ -40,6 +42,7 @@ if __name__ == "__main__":
 
     # initilize model, optimizer, criterion
     artnet = load_artnet()
+    artnet.to(device)
     optimizer = optim.SGD(artnet.parameters(), lr=3e-3, momentum=0.9)
     criterion = nn.CrossEntropyLoss()
 
@@ -54,6 +57,7 @@ if __name__ == "__main__":
             # loop over the 3 batches wrt branch
             for branch_name, branch_batch in zip(branch_names, data):
                 images, labels = branch_batch
+                images, labels = images.to(device), labels.to(device)
 
                 preds, loss = train_step(
                     branch_name, images, labels, artnet, optimizer, criterion
