@@ -92,7 +92,6 @@ class Cifar100:
         return dataloaders
 
     def __repr__(self) -> str:
-        # todo: implement this beauty
         pass
 
 

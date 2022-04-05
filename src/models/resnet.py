@@ -66,7 +66,7 @@ class Resnet(nn.Module):
             name = "linear"
             self._out_feature_channels[name] = curr_channels
 
-        # todo: check this, this might get 'name' that doesn't exist
+        # todo: check this, does this get 'name' variable which doesn't exist
         if out_features is None:
             out_features = [name]
         self._out_features = out_features

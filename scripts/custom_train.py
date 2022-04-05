@@ -29,7 +29,6 @@ def load_baseline(branch_dataloaders: dict):
     return model
 
 
-# todo: use argparse here
 if __name__ == "__main__":
     cifar_branch_dataloaders = load_cifar100()
     # pprint(cifar_branch_dataloaders)
@@ -62,7 +61,6 @@ if __name__ == "__main__":
                 images, labels = branch_batch
                 optimizer.zero_grad()
 
-                # todo: move forward, backward, optimize in func train_step
                 # forward
                 outputs = baseline(images, branch_name)
 

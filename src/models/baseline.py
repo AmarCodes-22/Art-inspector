@@ -129,7 +129,6 @@ class Baseline(nn.Module):
                 outputs_dict[branch] = branch(stem_out)
                 output_tensors.append(outputs_dict[branch])
 
-            # todo: this should probably return a torch.Tensor
             return torch.cat(output_tensors, dim=1)
         else:
             branch_name += "_branch"
