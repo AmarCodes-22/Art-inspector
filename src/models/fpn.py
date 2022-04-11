@@ -2,6 +2,7 @@ import math
 
 import torch
 import torch.nn.functional as F
+
 # from detectron2.modeling.backbone.fpn import LastLevelMaxPool
 from torch import nn
 

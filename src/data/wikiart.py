@@ -96,10 +96,8 @@ class Wikiart:
     def __init__(self, split: str) -> None:
 
         self.branch_names = ("artists", "styles", "genres")
-        self.branch_batch_sizes = dict(
-            load_config(ARTNET_CONFIG_FPATH).DATA.BATCH_SIZE
-        )
-        print(self.branch_batch_sizes)
+        self.branch_batch_sizes = dict(load_config(ARTNET_CONFIG_FPATH).DATA.BATCH_SIZE)
+        # print(self.branch_batch_sizes)
         # self.branch_batch_sizes = {"artists": 16, "styles": 32, "genres": 32}
 
         for branch_name in self.branch_names:

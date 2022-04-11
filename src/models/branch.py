@@ -36,6 +36,7 @@ class FPNBranch(nn.Module):
     ) -> None:
         # todo: write docstring
         super(FPNBranch, self).__init__()
+        self.resize_layer = nn.AdaptiveAvgPool2d((7, 7))
         self.conv1 = nn.Conv2d(in_channels, hidden_channels, kernel_size=3)
         self.conv2 = nn.Conv2d(hidden_channels, hidden_channels, kernel_size=3)
         self.conv3 = nn.Conv2d(hidden_channels, out_channels, kernel_size=3)
@@ -43,6 +44,7 @@ class FPNBranch(nn.Module):
         self.relu = nn.ReLU()
 
     def forward(self, x):
+        x = self.resize_layer(x)
         x = self.relu(self.conv1(x))
         x = self.relu(self.conv2(x))
         x = self.relu(self.conv3(x))
@@ -74,10 +76,10 @@ if __name__ == "__main__":
     branch = build_branch(artnet_config, branch_name="artists")
     print(type(branch))  # show which branch was dispatched
 
-    if artnet_config.MODEL.BRANCH.BRANCH_TYPE == "fpn":
+    if artnet_config.MODELS.BRANCH.BRANCH_TYPE == "fpn":
         dummy_in = torch.zeros((1, 128, 7, 7))
     else:
-        dummy_in = torch.zeros((1, artnet_config.MODEL.RESNET.RES2_OUT_CHANNELS * 8))
+        dummy_in = torch.zeros((1, artnet_config.MODELS.RESNET.RES2_OUT_CHANNELS * 8))
 
     dummy_out = branch(dummy_in)
     print(dummy_out.shape)

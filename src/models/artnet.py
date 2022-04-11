@@ -18,6 +18,7 @@ class ArtNet(nn.Module):
         self.branch_names = list(
             map(str.lower, list(dict(self.config.MODELS.BRANCH.BRANCHES).keys()))
         )
+        self.branch_type = self.config.MODELS.BRANCH.BRANCH_TYPE
 
         for branch_name in self.branch_names:
             branch = build_branch(cfg=self.config, branch_name=branch_name)
@@ -25,11 +26,17 @@ class ArtNet(nn.Module):
             setattr(self, branch_name, branch)
 
     def forward(self, x, branch_name):
-        # todo: implement this for multiple features maps
-        x = self.stem(x)[self.stem._out_feature_names[0]]
+        if self.branch_type == "fpn":
+            x = self.stem(x)  # returns a dict of fpn features
 
-        branch_out = getattr(self, branch_name + "_branch")(x)
-        return branch_out
+            output = dict()
+            for feature_name, features in x.items():
+                output[feature_name] = getattr(self, branch_name + "_branch")(features)
+        else:
+            x = self.stem(x)["linear"]
+            output = getattr(self, branch_name + "_branch")(x)
+
+        return output
 
     def _initialize_stem(self):
         if self.config.MODELS.BRANCH.BRANCH_TYPE == "linear":
@@ -44,5 +51,8 @@ if __name__ == "__main__":
 
     dummy_in = torch.zeros((1, 3, 224, 224))
     dummy_out = artnet(dummy_in, "artists")
-
-    print(dummy_out.shape)
+    if isinstance(dummy_out, torch.Tensor):
+        print(dummy_out.shape)
+    elif isinstance(dummy_out, dict):
+        for k, v in dummy_out.items():
+            print(k, v.shape)

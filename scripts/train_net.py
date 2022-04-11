@@ -1,10 +1,9 @@
-from torch import nn, optim
 import torch
+from torch import nn, optim
 
-from src.data.wikiart import Wikiart
 from src import ARTNET_CONFIG_FPATH
+from src.data.wikiart import Wikiart
 from src.models.artnet import ArtNet
-
 from src.utils import load_config
 
 
@@ -35,10 +34,14 @@ def train_step(branch_name, inputs, labels, model, optimizer, criterion):
 
 # todo: implement argparse
 if __name__ == "__main__":
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     config = load_config(ARTNET_CONFIG_FPATH)
 
     wikiart_trainloaders = load_wikiart_dataloaders(split="train")
+
+    # print(type(wikiart_trainloaders))
+    # artists_trainloader = wikiart_trainloaders['artists']
+    # print(type(artists_trainloader))
 
     branch_names, train_loaders = [], []
     for k, v in wikiart_trainloaders.items():
