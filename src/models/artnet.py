@@ -32,11 +32,12 @@ class ArtNet(nn.Module):
             output = dict()
             for feature_name, features in x.items():
                 output[feature_name] = getattr(self, branch_name + "_branch")(features)
+
+            return torch.cat(list(output.values()), 1)
         else:
             x = self.stem(x)["linear"]
             output = getattr(self, branch_name + "_branch")(x)
-
-        return output
+            return output
 
     def _initialize_stem(self):
         if self.config.MODELS.BRANCH.BRANCH_TYPE == "linear":
@@ -54,5 +55,6 @@ if __name__ == "__main__":
     if isinstance(dummy_out, torch.Tensor):
         print(dummy_out.shape)
     elif isinstance(dummy_out, dict):
+        # print(torch.cat(list(dummy_out.values()), 1).shape)
         for k, v in dummy_out.items():
             print(k, v.shape)

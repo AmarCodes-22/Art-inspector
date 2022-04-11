@@ -49,7 +49,7 @@ class FPNBranch(nn.Module):
         x = self.relu(self.conv2(x))
         x = self.relu(self.conv3(x))
         x = torch.flatten(x, 1)
-        x = self.relu(self.linear(x))
+        # x = self.relu(self.linear(x))
         return x
 
 
