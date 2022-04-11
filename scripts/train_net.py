@@ -39,10 +39,6 @@ if __name__ == "__main__":
 
     wikiart_trainloaders = load_wikiart_dataloaders(split="train")
 
-    # print(type(wikiart_trainloaders))
-    # artists_trainloader = wikiart_trainloaders['artists']
-    # print(type(artists_trainloader))
-
     branch_names, train_loaders = [], []
     for k, v in wikiart_trainloaders.items():
         branch_names.append(k)
@@ -61,6 +57,7 @@ if __name__ == "__main__":
         for i, data in enumerate(zip(*train_loaders)):
             # todo: this is better named batch loss because printing it out every batch
             running_loss = 0.0
+            running_acc = 0.0
 
             # loop over the 3 batches wrt branch
             for branch_name, branch_batch in zip(branch_names, data):
@@ -70,13 +67,14 @@ if __name__ == "__main__":
                 preds, loss = train_step(
                     branch_name, images, labels, artnet, optimizer, criterion
                 )
+
                 running_loss += loss.item()
-                # todo: get accuracy
+                running_acc += sum(torch.argmax(preds, dim=1) == labels)
 
                 # break
 
             # print stats every batch
-            print(f"Epoch: {epoch+1}, Batch: {i+1}, Loss: {running_loss:.3f}")
+            print(f"Epoch: {epoch+1}, Batch: {i+1}, Loss: {running_loss:.3f}, Acc: {running_acc/80:.3f}")
             running_loss = 0.0
 
             # break

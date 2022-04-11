@@ -5,13 +5,13 @@ MODELS:
     STEM_OUT_CHANNELS: 64
     RES2_OUT_CHANNELS: 64  # output channels from first stage
     DEPTH: 18
-    OUT_FEATURES: ['res4', 'res5']  # output of first stage is called res2
+    OUT_FEATURES: ['linear']  # output of first stage is called res2
   FPN:
-    IN_FEATURES: ['res4', 'res5']
+    IN_FEATURES: ['linear']
     OUT_CHANNELS: 128
   BRANCH:
     BRANCH_TYPE:
-      'fpn'  # 'fpn' or 'linear'
+      'linear'  # 'fpn' or 'linear'
     BRANCHES:
       ARTISTS:
         NUM_CLASSES: 20
