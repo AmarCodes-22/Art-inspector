@@ -14,8 +14,15 @@ def load_wikiart_dataloaders(split: str):
     return wikiart.load_dataloaders()
 
 
-def load_artnet(config_fpath=ARTNET_CONFIG_FPATH):
-    return ArtNet(config_fpath)
+def load_artnet(config_fpath=ARTNET_CONFIG_FPATH, resume=False):
+    config = load_config(ARTNET_CONFIG_FPATH)
+    if resume:
+        artnet = ArtNet(config_fpath).load_state_dict(
+            torch.load(config.TRAINING.RESUME_WEIGHTS)
+        )
+        return artnet
+    else:
+        return ArtNet(config_fpath)
 
 
 def train_step(branch_name, inputs, labels, model, optimizer, criterion):
@@ -51,7 +58,7 @@ if __name__ == "__main__":
         train_loaders.append(v)
 
     # initilize model, optimizer, criterion
-    artnet = load_artnet()
+    artnet = load_artnet(resume=True)
     artnet.to(device)
     optimizer = optim.SGD(artnet.parameters(), lr=3e-3, momentum=0.9)
     criterion = nn.CrossEntropyLoss()
@@ -90,7 +97,7 @@ if __name__ == "__main__":
             running_loss = 0.0
 
         if epoch % 10 == 0:
-            print("Saving model at epoch: {epoch}")
+            print(f"Saving model at epoch: {epoch}")
             save_model(
                 artnet, f"/content/drive/MyDrive/artinspector/weights/epoch{epoch}.pt"
             )

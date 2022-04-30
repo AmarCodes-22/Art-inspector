@@ -24,3 +24,5 @@ DATA:
     ARTISTS: 16
     GENRES: 32
     STYLES: 32
+TRAINING:
+  RESUME_WEIGHTS: /content/drive/MyDrive/artinspector/weights/epoch0.pt
