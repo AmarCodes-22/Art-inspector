@@ -1,4 +1,5 @@
 import os
+
 import torch
 from torch import nn, optim
 
@@ -55,8 +56,8 @@ if __name__ == "__main__":
     optimizer = optim.SGD(artnet.parameters(), lr=3e-3, momentum=0.9)
     criterion = nn.CrossEntropyLoss()
 
-    if not os.path.exists('/content/drive/MyDrive/artinspector/weights/'):
-        os.makedirs('/content/drive/MyDrive/artinspector/weights/')
+    if not os.path.exists("/content/drive/MyDrive/artinspector/weights/"):
+        os.makedirs("/content/drive/MyDrive/artinspector/weights/")
 
     # number of times to go through the dataset
     for epoch in range(1000):
@@ -82,12 +83,17 @@ if __name__ == "__main__":
                 # break
 
             # print stats every batch
-            print(f"Epoch: {epoch+1}, Batch: {i+1}, Loss: {running_loss:.3f}, Acc: {running_acc/80:.3f}")
+            print(
+                f"Epoch: {epoch+1}, Batch: {i+1}, Loss: {running_loss:.3f}, Acc:"
+                f" {running_acc/80:.3f}"
+            )
             running_loss = 0.0
 
         if epoch % 10 == 0:
-            print('Saving model at epoch: {epoch}')
-            save_model(artnet, '/content/drive/MyDrive/artinspector/weights/epoch{epoch}.pt')
+            print("Saving model at epoch: {epoch}")
+            save_model(
+                artnet, f"/content/drive/MyDrive/artinspector/weights/epoch{epoch}.pt"
+            )
 
             # break
         # break
