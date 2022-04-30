@@ -17,9 +17,8 @@ def load_wikiart_dataloaders(split: str):
 def load_artnet(config_fpath=ARTNET_CONFIG_FPATH, resume=False):
     config = load_config(ARTNET_CONFIG_FPATH)
     if resume:
-        artnet = ArtNet(config_fpath).load_state_dict(
-            torch.load(config.TRAINING.RESUME_WEIGHTS)
-        )
+        artnet = ArtNet(config_fpath)
+        artnet.load_state_dict(torch.load(config.TRAINING.RESUME_WEIGHTS))
         return artnet
     else:
         return ArtNet(config_fpath)
