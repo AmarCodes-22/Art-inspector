@@ -1,3 +1,4 @@
+import os
 import torch
 from torch import nn, optim
 
@@ -32,6 +33,10 @@ def train_step(branch_name, inputs, labels, model, optimizer, criterion):
     return preds, loss
 
 
+def save_model(model, path):
+    torch.save(model.state_dict(), path)
+
+
 # todo: implement argparse
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -50,8 +55,11 @@ if __name__ == "__main__":
     optimizer = optim.SGD(artnet.parameters(), lr=3e-3, momentum=0.9)
     criterion = nn.CrossEntropyLoss()
 
+    if not os.path.exists('/content/drive/MyDrive/artinspector/weights/'):
+        os.makedirs('/content/drive/MyDrive/artinspector/weights/')
+
     # number of times to go through the dataset
-    for epoch in range(2):
+    for epoch in range(1000):
 
         # data is a tuple of 3 batches, one from each dataset
         for i, data in enumerate(zip(*train_loaders)):
@@ -76,6 +84,10 @@ if __name__ == "__main__":
             # print stats every batch
             print(f"Epoch: {epoch+1}, Batch: {i+1}, Loss: {running_loss:.3f}, Acc: {running_acc/80:.3f}")
             running_loss = 0.0
+
+        if epoch % 10 == 0:
+            print('Saving model at epoch: {epoch}')
+            save_model(artnet, '/content/drive/MyDrive/artinspector/weights/epoch{epoch}.pt')
 
             # break
         # break
