@@ -57,7 +57,7 @@ def build_branch(cfg: CfgNode, branch_name: str):
     branch_config = dict(cfg.MODELS.BRANCH.BRANCHES)[branch_name.upper()]
 
     # output channels double every stage
-    stem_out_size = cfg.MODELS.RESNET.RES2_OUT_CHANNELS * (2 ** 3)
+    stem_out_size = cfg.MODELS.RESNET.RES2_OUT_CHANNELS * (2**3)
 
     branch_num_classes = branch_config.NUM_CLASSES
 
