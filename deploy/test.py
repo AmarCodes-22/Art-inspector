@@ -1,8 +1,13 @@
 import requests
 
 resp = requests.post(
-"http://localhost:5000/predict",
-files={'file': open('subset_dataset/Albrecht Durer/23.jpg', 'rb')}
+    "http://localhost:5000/predict",
+    files={'file': open('subset_dataset/Albrecht Durer/23.jpg', 'rb')}
+)
+# https://art-inspector.herokuapp.com/
+resp = requests.post(
+    "https://art-inspector.herokuapp.com/predict",
+    files={'file': open('subset_dataset/Albrecht Durer/23.jpg', 'rb')}
 )
 
 # resp = requests.post(

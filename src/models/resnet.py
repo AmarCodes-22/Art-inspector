@@ -215,11 +215,11 @@ def build_resnet_backbone(cfg):
     return CNN
 
 
-if __name__ == "__main__":
-    artnet_config = load_config(filepath=ARTNET_CONFIG_FPATH)
-    resnet_backbone = build_resnet_backbone(artnet_config)
+# if __name__ == "__main__":
+#     artnet_config = load_config(filepath=ARTNET_CONFIG_FPATH)
+#     resnet_backbone = build_resnet_backbone(artnet_config)
 
-    dummy_in = torch.zeros((1, 3, 224, 224))
-    dummy_out = resnet_backbone(dummy_in)
-    for k, v in dummy_out.items():
-        print(k, type(v), v.shape)
+#     dummy_in = torch.zeros((1, 3, 224, 224))
+#     dummy_out = resnet_backbone(dummy_in)
+#     for k, v in dummy_out.items():
+#         print(k, type(v), v.shape)

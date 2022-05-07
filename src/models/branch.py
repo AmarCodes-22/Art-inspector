@@ -70,16 +70,16 @@ def build_branch(cfg: CfgNode, branch_name: str):
         return LinearBranch(in_features=stem_out_size, out_features=branch_num_classes)
 
 
-if __name__ == "__main__":
-    artnet_config = load_config(ARTNET_CONFIG_FPATH)
+# if __name__ == "__main__":
+#     artnet_config = load_config(ARTNET_CONFIG_FPATH)
 
-    branch = build_branch(artnet_config, branch_name="artists")
-    print(type(branch))  # show which branch was dispatched
+#     branch = build_branch(artnet_config, branch_name="artists")
+#     print(type(branch))  # show which branch was dispatched
 
-    if artnet_config.MODELS.BRANCH.BRANCH_TYPE == "fpn":
-        dummy_in = torch.zeros((1, 128, 7, 7))
-    else:
-        dummy_in = torch.zeros((1, artnet_config.MODELS.RESNET.RES2_OUT_CHANNELS * 8))
+#     if artnet_config.MODELS.BRANCH.BRANCH_TYPE == "fpn":
+#         dummy_in = torch.zeros((1, 128, 7, 7))
+#     else:
+#         dummy_in = torch.zeros((1, artnet_config.MODELS.RESNET.RES2_OUT_CHANNELS * 8))
 
-    dummy_out = branch(dummy_in)
-    print(dummy_out.shape)
+#     dummy_out = branch(dummy_in)
+#     print(dummy_out.shape)

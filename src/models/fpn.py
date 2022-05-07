@@ -112,12 +112,12 @@ def build_resnet_fpn_backbone(cfg):
     return backbone
 
 
-if __name__ == "__main__":
-    artnet_config = load_config(filepath=ARTNET_CONFIG_FPATH)
-    fpn_backbone = build_resnet_fpn_backbone(artnet_config)
-    # print(type(fpn_backbone))
+# if __name__ == "__main__":
+#     artnet_config = load_config(filepath=ARTNET_CONFIG_FPATH)
+#     fpn_backbone = build_resnet_fpn_backbone(artnet_config)
+#     # print(type(fpn_backbone))
 
-    dummy_in = torch.zeros((1, 3, 224, 224))
-    dummy_out = fpn_backbone(dummy_in)
-    for k, v in dummy_out.items():
-        print(k, type(v), v.shape)
+#     dummy_in = torch.zeros((1, 3, 224, 224))
+#     dummy_out = fpn_backbone(dummy_in)
+#     for k, v in dummy_out.items():
+#         print(k, type(v), v.shape)

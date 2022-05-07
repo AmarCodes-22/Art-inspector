@@ -47,14 +47,14 @@ class ArtNet(nn.Module):
         return stem
 
 
-if __name__ == "__main__":
-    artnet = ArtNet(config_fpath=ARTNET_CONFIG_FPATH)
+# if __name__ == "__main__":
+#     artnet = ArtNet(config_fpath=ARTNET_CONFIG_FPATH)
 
-    dummy_in = torch.zeros((1, 3, 224, 224))
-    dummy_out = artnet(dummy_in, "artists")
-    if isinstance(dummy_out, torch.Tensor):
-        print(dummy_out.shape)
-    elif isinstance(dummy_out, dict):
-        # print(torch.cat(list(dummy_out.values()), 1).shape)
-        for k, v in dummy_out.items():
-            print(k, v.shape)
+#     dummy_in = torch.zeros((1, 3, 224, 224))
+#     dummy_out = artnet(dummy_in, "artists")
+#     if isinstance(dummy_out, torch.Tensor):
+#         print(dummy_out.shape)
+#     elif isinstance(dummy_out, dict):
+#         # print(torch.cat(list(dummy_out.values()), 1).shape)
+#         for k, v in dummy_out.items():
+#             print(k, v.shape)
