@@ -11,6 +11,8 @@ torchinfo
 torchvision
 torchviz
 
+yaml
+
 gunicorn
 Flask
 
