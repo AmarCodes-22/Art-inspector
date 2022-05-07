@@ -6,6 +6,6 @@ __pycache__
 /blacked.sh
 /artinspector.egg-info/
 *.pptx
-deploy/
+# deploy/
 predictions_dataset/
 subset_dataset/
