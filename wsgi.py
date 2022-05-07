@@ -1,0 +1,1 @@
+from deploy.app import app

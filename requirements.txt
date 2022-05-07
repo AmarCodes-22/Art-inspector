@@ -1,0 +1,14 @@
+# --find-links https://download.pytorch.org/whl/torch_stable.html
+--extra-index-url https://download.pytorch.org/whl/cpu
+# black
+# kaggle
+# matplotlib
+# pandas
+# tensorboard
+torch
+torchaudio
+torchinfo
+torchvision
+torchviz
+
+# pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
