@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from torch_utils import get_top_10
+from deploy.torch_utils import get_top_10
 
 # from app.torch_utils import transform_image, get_prediction  # production
 
