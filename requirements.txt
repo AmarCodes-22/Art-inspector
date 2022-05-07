@@ -1,6 +1,7 @@
 # --find-links https://download.pytorch.org/whl/torch_stable.html
 --extra-index-url https://download.pytorch.org/whl/cpu
--f https://dl.fbaipublicfiles.com/detectron2/wheels/cu111/torch1.8/index.html
+# -f https://dl.fbaipublicfiles.com/detectron2/wheels/cu111/torch1.8/index.html
+-f https://dl.fbaipublicfiles.com/detectron2/wheels/cpu/torch1.10/index.html
 # black
 # kaggle
 # matplotlib
