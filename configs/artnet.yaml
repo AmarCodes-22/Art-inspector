@@ -26,4 +26,5 @@ DATA:
     STYLES: 32
 TRAINING:
   # RESUME_WEIGHTS: /content/drive/MyDrive/artinspector/weights/epoch0.pt  # used for training
-  RESUME_WEIGHTS: /home/amar/dev/projects/major_project/art_inspector/models/epoch10.pt  # used for testing
+  # RESUME_WEIGHTS: /home/amar/dev/projects/major_project/art_inspector/models/epoch10.pt  # used for testing
+  RESUME_WEIGHTS: /app/models/epoch10.pt  # used for heroku
