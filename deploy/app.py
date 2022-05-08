@@ -23,5 +23,6 @@ def predict():
             top_10 = get_top_10(img_bytes)
             result = {'top10': top_10}
             return jsonify(result)
-        except:
+        except Exception as e:
+            print(e)
             return jsonify({'error': 'error during prediction'})
